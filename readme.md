@@ -129,7 +129,7 @@ function uploadDirHandler($parameter)
 }
 
 /**
-*
+* External handler for defining upload file name
 */
 function uploadNameHandler($parameter, $extension)
 {
