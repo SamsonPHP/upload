@@ -1,17 +1,17 @@
 # SamsonPHP Upload module
 
-[![Latest Stable Version](https://poser.pugx.org/samsonos/php_upload/v/stable.svg)](https://packagist.org/packages/samsonos/php_upload)
-[![Build Status](https://scrutinizer-ci.com/g/samsonos/php_upload/badges/build.png?b=master)](https://scrutinizer-ci.com/g/samsonos/php_upload/badges/build.png?b=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/samsonos/php_upload/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/samsonos/php_upload/?branch=master)
-[![Total Downloads](https://poser.pugx.org/samsonos/php_upload/downloads.svg)](https://packagist.org/packages/samsonos/php_upload)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/samsonos/php_upload/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/samsonos/php_upload/?branch=master)
-[![Stories in Ready](https://badge.waffle.io/samsonos/php_upload.png?label=ready&title=Ready)](https://waffle.io/samsonos/php_upload)
+[![Latest Stable Version](https://poser.pugx.org/samsonphp/upload/v/stable.svg)](https://packagist.org/packages/samsonphp/upload)
+[![Build Status](https://scrutinizer-ci.com/g/samsonphp/upload/badges/build.png?b=master)](https://scrutinizer-ci.com/g/samsonphp/upload/badges/build.png?b=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/samsonphp/upload/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/samsonphp/upload/?branch=master)
+[![Total Downloads](https://poser.pugx.org/samsonphp/upload/downloads.svg)](https://packagist.org/packages/samsonphp/upload)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/samsonphp/upload/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/samsonphp/upload/?branch=master)
+[![Stories in Ready](https://badge.waffle.io/samsonphp/upload.png?label=ready&title=Ready)](https://waffle.io/samsonphp/upload)
 
 ## Connection
 To use this module in your project you must add dependency in your ```composer.json```:
 ```json
 "require": {
-    "samsonos/php_upload": "*"
+    "samsonphp/upload": "1.*"
 },
 ```
 After doing ```composer install``` or ```composer update``` you will get all classes and functions of Upload module.
