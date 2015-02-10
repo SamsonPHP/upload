@@ -1,5 +1,5 @@
 <?php
-namespace samson\upload;
+namespace samsonphp\upload;
 
 /**
  * Created by PhpStorm.
@@ -10,7 +10,7 @@ namespace samson\upload;
 
 /**
  * Class ServerHandler
- * @package samson\upload
+ * @package samsonphp\upload
  */
 class ServerHandler
 {

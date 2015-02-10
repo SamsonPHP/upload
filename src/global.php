@@ -4,7 +4,7 @@
  * on 11.11.2014 at 17:17
  */
 
-use \samson\upload\Upload;
+use \samsonphp\upload\Upload;
 
 /**
  * Perform file uploading.
