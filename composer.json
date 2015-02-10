@@ -17,8 +17,7 @@
     "autoload" : {
         "classmap": ["src/"],
         "psr-0": {
-            "samson\\upload\\": "src/",
-            "samsonos\\upload\\": "src/"
+            "samsonphp\\upload\\": "src/"
         },
         "files": ["src/global.php"]
     },
