@@ -1,9 +1,9 @@
 <?php
-namespace samson\upload;
+namespace samsonphp\upload;
 
 /**
  * Generic file uploader
- * @package samson\upload
+ * @package samsonphp\upload
  * @author Vitaly Iegorov <egorov@samsonos.com>
  * @author Nikita Kotenko <kotenko@samsonos.com>
  */

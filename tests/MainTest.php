@@ -1,5 +1,5 @@
 <?php
-namespace samson\upload;
+namespace samsonphp\upload;
 
 /**
  * Created by Vitaly Iegorov <egorov@samsonos.com>
@@ -7,10 +7,10 @@ namespace samson\upload;
  */
 class MainTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \samson\upload\UploadController */
+    /** @var \samsonphp\upload\UploadController */
     public $instance;
 
-    /** @var \samson\upload\ServerHandler */
+    /** @var \samsonphp\upload\ServerHandler */
     public $serverHandler;
 
     public function fileNameHandler($name)
@@ -23,11 +23,11 @@ class MainTest extends \PHPUnit_Framework_TestCase
         \samson\core\Error::$OUTPUT = false;
 
         // Create Server Handler mock
-        $this->serverHandler = $this->getMockBuilder('\samson\upload\ServerHandler')
+        $this->serverHandler = $this->getMockBuilder('\samsonphp\upload\ServerHandler')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->instance = \samson\core\Service::getInstance('\samson\upload\UploadController');
+        $this->instance = \samson\core\Service::getInstance('\samsonphp\upload\UploadController');
         $this->instance->fs = \samson\core\Service::getInstance('\samsonphp\fs\FileService');
         $this->instance->fs->loadExternalService('\samsonphp\fs\LocalFileService');
         $this->instance->serverHandler = & $this->serverHandler;

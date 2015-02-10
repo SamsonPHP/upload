@@ -93,7 +93,7 @@ function catalog_async_upload()
     $json = array('status' => 0);
 
     // Create object for uploading file to server
-    $upload = new \samson\upload\Upload(array('png','jpg'), $parameter);
+    $upload = new \samsonphp\upload\Upload(array('png','jpg'), $parameter);
 
     if ($upload->upload($filePath, $fileName, $realName) {
         $json['status'] = 1;
@@ -109,7 +109,7 @@ function catalog_async_upload()
 }
 ```
 
-To create file upload you need to create class \samson\upload\Upload, constructor of which can have three parameters.
+To create file upload you need to create class \samsonphp\upload\Upload, constructor of which can have three parameters.
 
 * First parameter is array of allowable file extensions for uploading file.
 * Second is array of parameters (or just one parameter) for your callback functions. It can be used if you are using module configuration.

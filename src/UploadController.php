@@ -1,5 +1,5 @@
 <?php
-namespace samson\upload;
+namespace samsonphp\upload;
 
 use samson\core\CompressableExternalModule;
 
