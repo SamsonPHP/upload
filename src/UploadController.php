@@ -86,21 +86,16 @@ class UploadController extends CompressableExternalModule
      */
     public function __async_maxfilesize()
     {
-        $maxSize = -1;
-        $sizeString = '';
+        $sizeString = ini_get('post_max_size');
+        // Start with post_max_size.
+        $maxSize = $this->parseSize($sizeString);
 
-        if ($maxSize < 0) {
-            $sizeString = ini_get('post_max_size');
-            // Start with post_max_size.
-            $maxSize = $this->parseSize($sizeString);
-
-            // If upload_max_size is less, then reduce. Except if upload_max_size is
-            // zero, which indicates no limit.
-            $uploadMax = $this->parseSize(ini_get('upload_max_filesize'));
-            if ($uploadMax > 0 && $uploadMax < $maxSize) {
-                $maxSize = $uploadMax;
-                $sizeString = ini_get('upload_max_filesize');
-            }
+        // If upload_max_size is less, then reduce. Except if upload_max_size is
+        // zero, which indicates no limit.
+        $uploadMax = $this->parseSize(ini_get('upload_max_filesize'));
+        if ($uploadMax > 0 && $uploadMax < $maxSize) {
+            $maxSize = $uploadMax;
+            $sizeString = ini_get('upload_max_filesize');
         }
         return array('status' => true, 'maxSize' => $maxSize, 'sizeString' => $sizeString);
     }
