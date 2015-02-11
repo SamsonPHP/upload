@@ -28,7 +28,7 @@ var uploadFileHandler = function( selector, options )
                 var filename = s('.__file_name', p);
                 var line = s('p', progress);
                 var progress_text = s('.__progress_text', p);
-                var max_file_size = s('.__file_size', p);
+                //var max_file_size = s('.__file_size', p);
 
 
                 // Loading status
@@ -90,7 +90,8 @@ var uploadFileHandler = function( selector, options )
 
                 // Get upload controller url
                 var url = s('.__action', p).val();
-                var maxsize = parseInt(max_file_size.val());
+
+                var maxsize = 100;
 
                 // Perform request
                 xhr.open("POST", url, true);
@@ -102,14 +103,16 @@ var uploadFileHandler = function( selector, options )
                 // Add special async header
                 xhr.setRequestHeader('SJSAsync', 'true');
 
-                if (file.size < maxsize) {
-                    xhr.send(file);
-                } else {
-                    showStatus('Ошибка загрузки файла');
-                    alert('Слишом большой файл');
-                    if (options.error != undefined) options.error(file);
-                }
-
+                s.ajax('upload/maxfilesize', function(response){
+                    response = JSON.parse(response);
+                    if (file.size < response.maxSize) {
+                        xhr.send(file);
+                    } else {
+                        showStatus('Ошибка загрузки файла');
+                        alert('File is too big! Server limit is ' + response.sizeString);
+                        if (options.error != undefined) options.error(file);
+                    }
+                });
 
                 // Response handler
                 xhr.onreadystatechange = function () {

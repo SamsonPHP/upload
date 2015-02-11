@@ -79,4 +79,49 @@ class UploadController extends CompressableExternalModule
 
         return $path;
     }
+
+    /**
+     * Returns a file size limit in bytes based on the PHP upload_max_filesize and post_max_size
+     * @return float Size value
+     */
+    public function __async_maxfilesize()
+    {
+        $maxSize = -1;
+        $sizeString = '';
+
+        if ($maxSize < 0) {
+            $sizeString = ini_get('post_max_size');
+            // Start with post_max_size.
+            $maxSize = $this->parseSize($sizeString);
+
+            // If upload_max_size is less, then reduce. Except if upload_max_size is
+            // zero, which indicates no limit.
+            $uploadMax = $this->parseSize(ini_get('upload_max_filesize'));
+            if ($uploadMax > 0 && $uploadMax < $maxSize) {
+                $maxSize = $uploadMax;
+                $sizeString = ini_get('upload_max_filesize');
+            }
+        }
+        return array('status' => true, 'maxSize' => $maxSize, 'sizeString' => $sizeString);
+    }
+
+    /**
+     * Function to get size in bytes
+     * @param string $size File size string
+     * @return float Size number
+     */
+    private function parseSize($size)
+    {
+        // Remove the non-unit characters from the size.
+        $unit = preg_replace('/[^bkmgtpezy]/i', '', $size);
+        // Remove the non-numeric characters from the size.
+        $size = preg_replace('/[^0-9\.]/', '', $size);
+        if ($unit) {
+            // Find the position of the unit in the ordered
+            // string which is the power of magnitude to multiply a kilobyte by.
+            return round($size * pow(1024, stripos('bkmgtpezy', $unit[0])));
+        } else {
+            return round($size);
+        }
+    }
 }
