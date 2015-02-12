@@ -1,5 +1,6 @@
 <?php
 namespace samsonphp\upload;
+use SebastianBergmann\Comparator\MockObjectComparator;
 
 /**
  * Created by Vitaly Iegorov <egorov@samsonos.com>
@@ -10,8 +11,28 @@ class MainTest extends \PHPUnit_Framework_TestCase
     /** @var \samsonphp\upload\UploadController */
     public $instance;
 
-    /** @var \samsonphp\upload\ServerHandler */
-    public $serverHandler;
+    protected function setHandlerParams(& $handler)
+    {
+        $handler
+            ->expects($this->once())
+            ->method('name')
+            ->willReturn('tests/samsonos.png');
+
+        $handler
+            ->expects($this->once())
+            ->method('size')
+            ->willReturn('1003');
+
+        $handler
+            ->expects($this->once())
+            ->method('file')
+            ->willReturn(file_get_contents('tests/samsonos.png'));
+
+        $handler
+            ->expects($this->once())
+            ->method('type')
+            ->willReturn('png');
+    }
 
     public function fileNameHandler($name)
     {
@@ -22,15 +43,9 @@ class MainTest extends \PHPUnit_Framework_TestCase
     {
         \samson\core\Error::$OUTPUT = false;
 
-        // Create Server Handler mock
-        $this->serverHandler = $this->getMockBuilder('\samsonphp\upload\ServerHandler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->instance = \samson\core\Service::getInstance('\samsonphp\upload\UploadController');
         $this->instance->fs = \samson\core\Service::getInstance('\samsonphp\fs\FileService');
         $this->instance->fs->loadExternalService('\samsonphp\fs\LocalFileService');
-        $this->instance->serverHandler = & $this->serverHandler;
     }
 
     // Test main method
@@ -45,27 +60,14 @@ class MainTest extends \PHPUnit_Framework_TestCase
             in_array($result['sizeString'], array(ini_get('post_max_size'), ini_get('upload_max_filesize')))
         );
 
-        $this->serverHandler
-           ->expects($this->once())
-           ->method('name')
-           ->willReturn('tests/samsonos.png');
-
-        $this->serverHandler
-           ->expects($this->once())
-           ->method('size')
-           ->willReturn('1003');
-
-        $this->serverHandler
-           ->expects($this->once())
-           ->method('file')
-           ->willReturn(file_get_contents('tests/samsonos.png'));
-
-        $this->serverHandler
-           ->expects($this->once())
-           ->method('type')
-           ->willReturn('png');
-
         $upload = new Upload(array(), null, $this->instance);
+
+        // Create Server Handler mock
+        $upload->handler = $this->getMockBuilder('\samsonphp\upload\AsyncHandler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->setHandlerParams($upload->handler);
 
         $upload->upload($filePath, $uploadName, $fileName);
 
@@ -86,14 +88,18 @@ class MainTest extends \PHPUnit_Framework_TestCase
     public function testUploadFunctions()
     {
         $this->instance->init();
-        $this->instance->serverHandler = & $this->serverHandler;
 
-        $this->serverHandler
+        $upload = new Upload(array(), null, $this->instance);
+
+        // Create Server Handler mock
+        $upload->handler = $this->getMockBuilder('\samsonphp\upload\AsyncHandler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $upload->handler
             ->expects($this->once())
             ->method('name')
             ->willReturn('');
-
-        $upload = new Upload(array(), null, $this->instance);
 
         $this->assertFalse($upload->upload());
     }
@@ -103,45 +109,37 @@ class MainTest extends \PHPUnit_Framework_TestCase
     {
         $this->instance->init();
         $this->instance->fileNameHandler = array($this, 'fileNameHandler');
-        $this->instance->serverHandler = & $this->serverHandler;
-
-        $this->serverHandler
-            ->expects($this->once())
-            ->method('name')
-            ->willReturn('tests/samsonos.png');
-
-        $this->serverHandler
-            ->expects($this->once())
-            ->method('size')
-            ->willReturn('16256');
-
-        $this->serverHandler
-            ->expects($this->once())
-            ->method('file')
-            ->willReturn(file_get_contents('tests/samsonos.png'));
-
-        $this->serverHandler
-            ->expects($this->once())
-            ->method('type')
-            ->willReturn('png');
 
         $upload = new Upload(array(), 'myFile.png', $this->instance);
 
-        $upload->upload($filePath, $uploadName, $fileName);
+        // Create Server Handler mock
+        $upload->handler = $this->getMockBuilder('\samsonphp\upload\AsyncHandler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->setHandlerParams($upload->handler);
+
+        $upload->upload($filePath);
+
+        $this->assertNotEquals(0, strripos($filePath, 'myFile.png'));
     }
 
     // Test upload with extension error
     public function testExtension()
     {
         $this->instance->init();
-        $this->instance->serverHandler = & $this->serverHandler;
 
-        $this->serverHandler
+        $upload = new Upload(array('xls', 'gif'), null, $this->instance);
+
+        // Create Server Handler mock
+        $upload->handler = $this->getMockBuilder('\samsonphp\upload\AsyncHandler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $upload->handler
             ->expects($this->once())
             ->method('name')
             ->willReturn('tests/samsonos.png');
-
-        $upload = new Upload(array('xls', 'gif'), null, $this->instance);
 
         $this->assertFalse($upload->upload());
     }
@@ -154,12 +152,60 @@ class MainTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $serverHandler = new ServerHandler($fs);
+        $serverHandler = new AsyncHandler($fs);
 
         $serverHandler->name();
         $serverHandler->size();
         $serverHandler->file();
         $serverHandler->type();
         $serverHandler->write('fileName', 'fileDir', 'uploadDir');
+    }
+
+    public function testSyncUploading()
+    {
+        $this->instance->init();
+
+        $upload = new Upload(array(), null, $this->instance);
+
+        // Create Server Handler mock
+        $upload->handler = $this->getMockBuilder('\samsonphp\upload\SyncHandler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $upload->handler
+            ->expects($this->once())
+            ->method('name')
+            ->with($this->anything())
+            ->willReturn('samsonos.png');
+
+        $upload->handler
+            ->expects($this->once())
+            ->method('size')
+            ->with($this->anything())
+            ->willReturn('1003');
+
+        $upload->handler
+            ->expects($this->once())
+            ->method('file')
+            ->with($this->anything())
+            ->willReturn(file_get_contents('tests/samsonos.png'));
+
+        $upload->handler
+            ->expects($this->once())
+            ->method('type')
+            ->with($this->anything())
+            ->willReturn('png');
+
+        $upload->filesContainer = array(
+            'filename' => array(
+                'name' => 'samsonos.png',
+                'type' => 'image/jpeg',
+                'tmp_name' => 'tests/samsonos.png',
+                'error' => 0,
+                'size' => '1003'
+            )
+        );
+
+        $upload->async(false)->upload($fileName, $filePath, $uploadName);
     }
 }
