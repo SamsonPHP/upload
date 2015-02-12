@@ -25,7 +25,7 @@ class SyncHandler implements iHandler
 
     /**
      * Get file name from $_FILES array
-     * @param null $name Name of post file (for using $_FILES array)
+     * @param string $name Name of post file (for using $_FILES array)
      * @return string Name of uploaded file
      */
     public function name($name = null)
@@ -35,7 +35,7 @@ class SyncHandler implements iHandler
 
     /**
      * Get file size from $_FILES array
-     * @param null $name Name of post file (for using $_FILES array)
+     * @param string $name Name of post file (for using $_FILES array)
      * @return integer Size of uploaded file
      */
     public function size($name = null)
@@ -45,7 +45,7 @@ class SyncHandler implements iHandler
 
     /**
      * Get file type from $_FILES array
-     * @param null $name Name of post file (for using $_FILES array)
+     * @param string $name Name of post file (for using $_FILES array)
      * @return string Mime type of uploaded file
      */
     public function type($name = null)
@@ -55,7 +55,7 @@ class SyncHandler implements iHandler
 
     /**
      * Get file content from $_FILES array
-     * @param null $name Name of post file (for using $_FILES array)
+     * @param string $name Name of post file (for using $_FILES array)
      * @return string File content
      */
     public function file($name = null)
