@@ -154,6 +154,13 @@ class Upload
         return false;
     }
 
+    /**
+     * Asynchronous uploading method
+     * @param string $filePath
+     * @param string $uploadName
+     * @param string $fileName
+     * @return bool
+     */
     protected function asyncUploading(& $filePath = '', & $uploadName = '', & $fileName = '')
     {
         // Try to get upload file with new upload method
@@ -169,6 +176,13 @@ class Upload
         return false;
     }
 
+    /**
+     * Synchronous uploading method
+     * @param string $filePath
+     * @param string $uploadName
+     * @param string $fileName
+     * @return bool
+     */
     protected function syncUploading(& $filePath = '', & $uploadName = '', & $fileName = '')
     {
         $container = isset($this->filesContainer) ? $this->filesContainer : $_FILES;
