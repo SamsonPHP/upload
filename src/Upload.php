@@ -64,10 +64,9 @@ class Upload
 
     protected function setHandler()
     {
-        // Set async handler
-        if (!isset($this->handler)) {
-            $this->handler = $this->async ? new AsyncHandler() : new SyncHandler();
-        }
+        // Set server handler
+        $this->handler = !isset($this->handler) ?
+            ($this->async ? new AsyncHandler() : new SyncHandler()) : $this->handler;
     }
 
     /**
@@ -191,7 +190,6 @@ class Upload
      * Constructor
      * @param mixed $extensions Collection or single excepted extension
      * @param mixed $relPathParameters Data to be passed to external rel. path builder
-     * @param boolean $async Data to be passed to external rel. path builder
      * @param mixed $config External configuration class
      */
     public function __construct($extensions = array(), $relPathParameters = null, $config = null)

@@ -28,6 +28,7 @@ class AsyncHandler implements iHandler
 
     /**
      * Get file name from $_SERVER array
+     * @param null $name Name of post file (for using $_FILES array)
      * @return string Name of uploaded file
      */
     public function name($name = null)
@@ -37,6 +38,7 @@ class AsyncHandler implements iHandler
 
     /**
      * Get file size from $_SERVER array
+     * @param null $name Name of post file (for using $_FILES array)
      * @return integer Size of uploaded file
      */
     public function size($name = null)
@@ -46,6 +48,7 @@ class AsyncHandler implements iHandler
 
     /**
      * Get file type from $_SERVER array
+     * @param null $name Name of post file (for using $_FILES array)
      * @return string Mime type of uploaded file
      */
     public function type($name = null)
@@ -54,7 +57,8 @@ class AsyncHandler implements iHandler
     }
 
     /**
-     * Get file content from input socket
+     * Get file content from php input socket
+     * @param null $name Name of post file (for using $_FILES array)
      * @return string File content
      */
     public function file($name = null)

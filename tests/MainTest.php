@@ -159,6 +159,14 @@ class MainTest extends \PHPUnit_Framework_TestCase
         $serverHandler->file();
         $serverHandler->type();
         $serverHandler->write('fileName', 'fileDir', 'uploadDir');
+
+        $serverHandler = new SyncHandler($fs);
+
+        $serverHandler->name('');
+        $serverHandler->size('');
+        $serverHandler->file('');
+        $serverHandler->type('');
+        $serverHandler->write('fileName', 'fileDir', 'uploadDir');
     }
 
     public function testSyncUploading()
