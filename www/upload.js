@@ -91,8 +91,6 @@ var uploadFileHandler = function( selector, options )
                 // Get upload controller url
                 var url = s('.__action', p).val();
 
-                var maxsize = 100;
-
                 // Perform request
                 xhr.open("POST", url, true);
                 xhr.setRequestHeader("Cache-Control", "no-cache");
