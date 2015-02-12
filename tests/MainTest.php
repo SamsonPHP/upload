@@ -38,6 +38,13 @@ class MainTest extends \PHPUnit_Framework_TestCase
     {
         $this->instance->init();
 
+        $result = $this->instance->__async_maxfilesize();
+
+        $this->assertEquals(
+            true,
+            in_array($result['sizeString'], array(ini_get('post_max_size'), ini_get('upload_max_filesize')))
+        );
+
         $this->serverHandler
            ->expects($this->once())
            ->method('name')
