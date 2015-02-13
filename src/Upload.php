@@ -70,20 +70,6 @@ class Upload
     }
 
     /**
-     * Set upload function parameters
-     * @param string $filePath
-     * @param string $uploadName
-     * @param string $fileName
-     */
-    protected function setUploadParams(& $filePath = '', & $uploadName = '', & $fileName = '')
-    {
-        // store data for output
-        $filePath = $this->fullPath();
-        $uploadName = $this->name();
-        $fileName = $this->realName();
-    }
-
-    /**
      * Set properties of current file upload
      * @param string $filePath
      * @param string $uploadName
@@ -92,11 +78,6 @@ class Upload
      */
     protected function setUploadProperties(& $filePath = '', & $uploadName = '', & $fileName = '', $postName = '')
     {
-        // If we have not created filename - generic generate it
-        if (!isset($this->fileName)) {
-            $this->fileName = strtolower(md5(time().$this->realName).'.'.$this->extension);
-        }
-
         /** @var string $file Read uploaded file */
         $file = $this->handler->file($postName);
 
@@ -108,20 +89,25 @@ class Upload
         $this->mimeType = $this->handler->type($postName);
 
         // Set function parameters
-        $this->setUploadParams($filePath, $uploadName, $fileName);
+        $filePath = $this->fullPath();
+        $uploadName = $this->name();
+        $fileName = $this->realName();
     }
 
     /**
      * Try to create unique file name using external callback handler
      */
-    protected function setExternalName()
+    protected function setName()
     {
         // If we have callable handler for generating file name
         if (isset($this->config->fileNameHandler) && is_callable($this->config->fileNameHandler)) {
             // Add file extension as last parameter
             array_push($this->relPathParameters, $this->extension);
+
             // Call handler and create fileName
             $this->fileName = call_user_func_array($this->config->fileNameHandler, $this->relPathParameters);
+        } else { // If we have not created filename - generic generate it
+            $this->fileName = strtolower(md5(time().$this->realName).'.'.$this->extension);
         }
     }
 
@@ -141,7 +127,7 @@ class Upload
         // If we have no extension limitations or they are matched
         if (!sizeof($this->extensions) || in_array($this->extension, $this->extensions)) {
             // Try to set file name using external handler
-            $this->setExternalName();
+            $this->setName();
 
             // Set function parameters
             $this->setUploadProperties($filePath, $uploadName, $fileName, $postName);
