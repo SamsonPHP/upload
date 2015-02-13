@@ -60,12 +60,11 @@ class MainTest extends \PHPUnit_Framework_TestCase
             in_array($result['sizeString'], array(ini_get('post_max_size'), ini_get('upload_max_filesize')))
         );
 
-        $upload = new Upload(array(), null, $this->instance);
 
-        // Create Server Handler mock
-        $upload->handler = $this->getMockBuilder('\samsonphp\upload\AsyncHandler')
+        $upload = new Upload(array(), null, $this->instance, $this->getMockBuilder('\samsonphp\upload\AsyncHandler')
             ->disableOriginalConstructor()
-            ->getMock();
+            ->getMock());
+
 
         $this->setHandlerParams($upload->handler);
 
@@ -89,12 +88,9 @@ class MainTest extends \PHPUnit_Framework_TestCase
     {
         $this->instance->init();
 
-        $upload = new Upload(array(), null, $this->instance);
-
-        // Create Server Handler mock
-        $upload->handler = $this->getMockBuilder('\samsonphp\upload\AsyncHandler')
+        $upload = new Upload(array(), null, $this->instance, $this->getMockBuilder('\samsonphp\upload\AsyncHandler')
             ->disableOriginalConstructor()
-            ->getMock();
+            ->getMock());
 
         $upload->handler
             ->expects($this->once())
@@ -110,12 +106,9 @@ class MainTest extends \PHPUnit_Framework_TestCase
         $this->instance->init();
         $this->instance->fileNameHandler = array($this, 'fileNameHandler');
 
-        $upload = new Upload(array(), 'myFile.png', $this->instance);
-
-        // Create Server Handler mock
-        $upload->handler = $this->getMockBuilder('\samsonphp\upload\AsyncHandler')
+        $upload = new Upload(array(), 'myFile.png', $this->instance, $this->getMockBuilder('\samsonphp\upload\AsyncHandler')
             ->disableOriginalConstructor()
-            ->getMock();
+            ->getMock());
 
         $this->setHandlerParams($upload->handler);
 
@@ -129,12 +122,9 @@ class MainTest extends \PHPUnit_Framework_TestCase
     {
         $this->instance->init();
 
-        $upload = new Upload(array('xls', 'gif'), null, $this->instance);
-
-        // Create Server Handler mock
-        $upload->handler = $this->getMockBuilder('\samsonphp\upload\AsyncHandler')
+        $upload = new Upload(array('xls', 'gif'), null, $this->instance, $this->getMockBuilder('\samsonphp\upload\AsyncHandler')
             ->disableOriginalConstructor()
-            ->getMock();
+            ->getMock());
 
         $upload->handler
             ->expects($this->once())
@@ -173,12 +163,9 @@ class MainTest extends \PHPUnit_Framework_TestCase
     {
         $this->instance->init();
 
-        $upload = new Upload(array(), null, $this->instance);
-
-        // Create Server Handler mock
-        $upload->handler = $this->getMockBuilder('\samsonphp\upload\SyncHandler')
+        $upload = new Upload(array(), null, $this->instance, $this->getMockBuilder('\samsonphp\upload\SyncHandler')
             ->disableOriginalConstructor()
-            ->getMock();
+            ->getMock());
 
         $upload->handler
             ->expects($this->once())
@@ -204,7 +191,7 @@ class MainTest extends \PHPUnit_Framework_TestCase
             ->with($this->anything())
             ->willReturn('png');
 
-        $upload->filesContainer = array(
+        $_FILES = array(
             'filename' => array(
                 'name' => 'samsonos.png',
                 'type' => 'image/jpeg',
@@ -225,12 +212,9 @@ class MainTest extends \PHPUnit_Framework_TestCase
     {
         $this->instance->init();
 
-        $upload = new Upload(array('gif', 'xls'), null, $this->instance);
-
-        // Create Server Handler mock
-        $upload->handler = $this->getMockBuilder('\samsonphp\upload\SyncHandler')
+        $upload = new Upload(array('gif', 'xls'), null, $this->instance, $this->getMockBuilder('\samsonphp\upload\SyncHandler')
             ->disableOriginalConstructor()
-            ->getMock();
+            ->getMock());
 
         $upload->handler
             ->expects($this->once())
@@ -238,7 +222,7 @@ class MainTest extends \PHPUnit_Framework_TestCase
             ->with($this->anything())
             ->willReturn('samsonos.png');
 
-        $upload->filesContainer = array(
+        $_FILES = array(
             'filename' => array(
                 'name' => 'samsonos.png',
                 'type' => 'image/jpeg',

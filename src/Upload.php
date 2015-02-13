@@ -45,9 +45,6 @@ class Upload
     /** @var iHandler Handler for processing file option requests */
     public $handler;
 
-    /** @var array with files for uploading */
-    public $filesContainer;
-
     /**
      * Init module main fields
      * @param array $extensions Allowed file types
@@ -60,13 +57,6 @@ class Upload
 
         // Set file extension limitations, form array if isn't an array
         $this->extensions = is_array($extensions) ? $extensions : array($extensions);
-    }
-
-    protected function setHandler()
-    {
-        // Set server handler
-        $this->handler = !isset($this->handler) ?
-            ($this->async ? new AsyncHandler() : new SyncHandler()) : $this->handler;
     }
 
     /**
@@ -171,9 +161,7 @@ class Upload
      */
     protected function syncUploading(& $filePath = '', & $uploadName = '', & $fileName = '')
     {
-        $container = isset($this->filesContainer) ? $this->filesContainer : $_FILES;
-
-        foreach ($container as $postName => $postArray) {
+        foreach ($_FILES as $postName => $postArray) {
             // Try to get upload file with new upload method
             $this->realName = $this->handler->name($postName);
 
@@ -192,7 +180,7 @@ class Upload
      * @param mixed $relPathParameters Data to be passed to external rel. path builder
      * @param mixed $config External configuration class
      */
-    public function __construct($extensions = array(), $relPathParameters = null, $config = null)
+    public function __construct($extensions = array(), $relPathParameters = null, $config = null, $handler = null)
     {
         // Init main parameters of current object
         $this->initParams($extensions, $relPathParameters);
@@ -202,6 +190,8 @@ class Upload
 
         // Build relative path for uploading
         $this->uploadDir = call_user_func_array($this->config->uploadDirHandler, $this->relPathParameters);
+
+        $this->handler = isset($handler) ? $handler : new AsyncHandler();
     }
 
     /**
@@ -213,8 +203,6 @@ class Upload
      */
     public function upload(& $filePath = '', & $uploadName = '', & $fileName = '')
     {
-        $this->setHandler();
-
         return $this->async ?
             $this->asyncUploading($filePath, $uploadName, $fileName) :
             $this->syncUploading($filePath, $uploadName, $fileName);
