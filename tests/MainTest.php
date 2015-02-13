@@ -238,6 +238,17 @@ class MainTest extends \PHPUnit_Framework_TestCase
             ->with($this->anything())
             ->willReturn('samsonos.png');
 
-        $this->assertFalse($upload->upload());
+        $upload->filesContainer = array(
+            'filename' => array(
+                'name' => 'samsonos.png',
+                'type' => 'image/jpeg',
+                'tmp_name' => 'tests/samsonos.png',
+                'error' => 0,
+                'size' => '1003'
+            )
+        );
+
+
+        $this->assertFalse($upload->async(false)->upload());
     }
 }
