@@ -215,5 +215,29 @@ class MainTest extends \PHPUnit_Framework_TestCase
         );
 
         $upload->async(false)->upload($fileName, $filePath, $uploadName);
+
+        $this->assertNotNull($fileName);
+        $this->assertNotNull($filePath);
+        $this->assertEquals('samsonos.png', $uploadName);
+    }
+
+    public function testFailedSync()
+    {
+        $this->instance->init();
+
+        $upload = new Upload(array('gif', 'xls'), null, $this->instance);
+
+        // Create Server Handler mock
+        $upload->handler = $this->getMockBuilder('\samsonphp\upload\SyncHandler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $upload->handler
+            ->expects($this->once())
+            ->method('name')
+            ->with($this->anything())
+            ->willReturn('samsonos.png');
+
+        $this->assertFalse($upload->upload());
     }
 }
