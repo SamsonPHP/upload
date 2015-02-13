@@ -45,6 +45,8 @@ class Upload
     /** @var iHandler Handler for processing file option requests */
     public $handler;
 
+    public $files = array();
+
     /**
      * Init module main fields
      * @param array $extensions Allowed file types
@@ -60,31 +62,6 @@ class Upload
     }
 
     /**
-     * Set properties of current file upload
-     * @param string $filePath
-     * @param string $uploadName
-     * @param string $fileName
-     * @param string $postName
-     */
-    protected function setUploadProperties(& $filePath = '', & $uploadName = '', & $fileName = '', $postName = '')
-    {
-        /** @var string $file Read uploaded file */
-        $file = $this->handler->file($postName);
-
-        // Create file
-        $this->filePath = $this->handler->write($file, $this->fileName, $this->uploadDir);
-
-        // Save size and mimeType
-        $this->size = $this->handler->size($postName);
-        $this->mimeType = $this->handler->type($postName);
-
-        // Set function parameters
-        $filePath = $this->fullPath();
-        $uploadName = $this->name();
-        $fileName = $this->realName();
-    }
-
-    /**
      * Try to create unique file name using external callback handler
      */
     protected function setName()
@@ -97,19 +74,16 @@ class Upload
             // Call handler and create fileName
             $this->fileName = call_user_func_array($this->config->fileNameHandler, $this->relPathParameters);
         } else { // If we have not created filename - generic generate it
-            $this->fileName = strtolower(md5(time().$this->realName).'.'.$this->extension);
+            $this->fileName = strtolower(md5(time() . $this->realName) . '.' . $this->extension);
         }
     }
 
     /**
      * Make file uploading
-     * @param string $filePath
-     * @param string $uploadName
-     * @param string $fileName
      * @param string $postName
      * @return bool Upload status
      */
-    protected function createUpload(& $filePath = '', & $uploadName = '', & $fileName = '', $postName = '')
+    protected function createUpload($postName = '')
     {
         // Get file extension
         $this->extension = pathinfo($this->realName, PATHINFO_EXTENSION);
@@ -119,8 +93,15 @@ class Upload
             // Try to set file name using external handler
             $this->setName();
 
-            // Set function parameters
-            $this->setUploadProperties($filePath, $uploadName, $fileName, $postName);
+            /** @var string $file Read uploaded file */
+            $file = $this->handler->file($postName);
+
+            // Create file
+            $this->filePath = $this->handler->write($file, $this->fileName, $this->uploadDir);
+
+            // Save size and mimeType
+            $this->size = $this->handler->size($postName);
+            $this->mimeType = $this->handler->type($postName);
 
             // Success
             return true;
@@ -132,12 +113,9 @@ class Upload
 
     /**
      * Asynchronous uploading method
-     * @param string $filePath
-     * @param string $uploadName
-     * @param string $fileName
      * @return bool
      */
-    protected function asyncUploading(& $filePath = '', & $uploadName = '', & $fileName = '')
+    protected function asyncUploading()
     {
         // Try to get upload file with new upload method
         $this->realName = $this->handler->name();
@@ -145,7 +123,7 @@ class Upload
         // If upload data exists
         if (isset($this->realName) && $this->realName != '') {
             // Try to create upload
-            return $this->createUpload($filePath, $uploadName, $fileName);
+            return $this->createUpload();
         }
 
         // Failed
@@ -154,24 +132,39 @@ class Upload
 
     /**
      * Synchronous uploading method
-     * @param string $filePath
-     * @param string $uploadName
-     * @param string $fileName
      * @return bool
      */
-    protected function syncUploading(& $filePath = '', & $uploadName = '', & $fileName = '')
+    protected function syncUploading()
     {
         foreach ($_FILES as $postName => $postArray) {
             // Try to get upload file with new upload method
             $this->realName = $this->handler->name($postName);
 
             // Return false if something went wrong
-            if (!$this->createUpload($filePath, $uploadName, $fileName, $postName)) {
+            if (!$this->createUpload($postName)) {
                 return false;
             }
+
+            // Save uploaded file to inner field
+            $this->addFile($postName);
         }
 
+        // Success
         return true;
+    }
+
+    /**
+     * Add uploaded file to files array
+     * @param $postName string Name of file in users form
+     */
+    protected function addFile($postName)
+    {
+        $this->files[$postName] = array();
+        $this->files['size'] = $this->size;
+        $this->files['extension'] = $this->extension;
+        $this->files['path'] = $this->path();
+        $this->files['fullPath'] = $this->fullPath();
+        $this->files['name'] = $this->name();
     }
 
     /**
@@ -191,6 +184,7 @@ class Upload
         // Build relative path for uploading
         $this->uploadDir = call_user_func_array($this->config->uploadDirHandler, $this->relPathParameters);
 
+        // Set file options handler
         $this->handler = isset($handler) ? $handler : new AsyncHandler();
     }
 
@@ -203,10 +197,15 @@ class Upload
      */
     public function upload(& $filePath = '', & $uploadName = '', & $fileName = '')
     {
-        return $this->async ?
-            $this->asyncUploading($filePath, $uploadName, $fileName) :
-            $this->syncUploading($filePath, $uploadName, $fileName);
+        $status = $this->async ?
+            $this->asyncUploading() :
+            $this->syncUploading();
 
+        $filePath = $this->fullPath();
+        $uploadName = $this->name();
+        $fileName = $this->realName();
+
+        return $status;
     }
 
     public function async($async = true)
