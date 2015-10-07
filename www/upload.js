@@ -8,6 +8,8 @@ var uploadFileHandler = function( selector, options )
 	{
         // If no file selected - exit
         if (!input.DOMElement.files.length) {
+            console.log(input);
+            console.log('Cannot bind asynchronous file uploader - no file inputs found');
             return true;
         }
 
