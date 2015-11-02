@@ -217,21 +217,8 @@ var sjsFileUpload = {
                         sending(sjsElem, file, xhr);
                     }
 
-                    var flagExt = false;
-
-                    if (typeUpload == 'gallery') {
-                        if (file.type.indexOf('image') != -1) {
-                            flagExt = true;
-                        }
-                    } else {
-                        flagExt = true;
-                    }
-
-                    if (maxSize > file.size && flagExt) {
+                    if (maxSize > file.size) {
                         xhr.send(file);
-                    } else if(!flagExt){
-                        (error === undefined) ? alert('Файл не является картинкой (' + file.name + ')') : error(sjsElem, 'File not image!');
-                        if (completeAll != undefined) { completeAll(sjsElem); }
                     } else {
                         (error === undefined) ? alert('Файл слишком большой (' + file.size + 'B). Максимальный размер файла: ' + maxSize + 'B.') : error(sjsElem, 'File is too big!');
                         if (completeAll != undefined) { completeAll(sjsElem); }
@@ -245,6 +232,11 @@ var sjsFileUpload = {
                                 var block = progressBlocks.elements[_i];
                                 block.removeClass('__upload_process');
                                 block.addClass('__upload_complete');
+
+                                var response = JSON.parse(xhr.response);
+                                if (!response['status'] && response['verifyImageError']) {
+                                    alert('Файл не является картинкой (' + file.name + ')');
+                                }
                             } else {
                                 successFile(xhr.response, progressBlocks.elements[_i]);
                             }
