@@ -6,7 +6,7 @@ var sjsFileUpload = {
 
     /**
      * Function to bind DOM element to upload file on drop
-     * @param options Object of handlers to perform on different actions.
+     * @param options Object of handlers to perform on different actions, typeUpload String type upload
      */
     fileUpload : function(options) {
 
@@ -106,7 +106,8 @@ var sjsFileUpload = {
         /**
          * Variables to store elements, to show file upload progress
          */
-        var progressBlocks, progressBars, progressTexts, progressBytes, loadPercent = 0;
+        var progressBlocks, progressBars, progressTexts, progressBytes, loadPercent = 0, textUpload = 'Загрузить файл',
+            textProcess = 'Загрузка файла';
 
         // Bind all input options
         if (typeof options === 'object') {
@@ -118,6 +119,12 @@ var sjsFileUpload = {
             uploadProgress = options.uploadProgress;
             successFile = options.successFile;
             completeAll = options.completeAll;
+            if (options.textUpload) {
+                textUpload = options.textUpload;
+            }
+            if (options.textProcess) {
+                textProcess = options.textProcess;
+            }
         }
 
         // URL to send file
@@ -126,7 +133,7 @@ var sjsFileUpload = {
         if (inputSelector === undefined) {
             sjsElem.append('<div class="__btn_upload">' +
             '<input class="__input_file" type="file" multiple>' +
-            '<label class="__progress_text">Загрузить файл</label>' +
+            '<label class="__progress_text">' + textUpload + '</label>' +
             '</div>');
             input = s('.__input_file', sjsElem);
         } else {
@@ -151,10 +158,9 @@ var sjsFileUpload = {
                         sjsElem.parent().append('<div class="__upload_process">' +
                         '<div class="__progress_bar"><p></p></div>' +
                         '<div class="__upload_text">' +
-                        '<label class="__progress_text">Загрузка файла</label>' +
-                        '<label class="__progress_bytes"></label>' +
-                        '</div>' +
-                        '</div>');
+                        '<label class="__progress_text">'+ textProcess +
+                        '</label><label class="__progress_bytes"></label>' +
+                        '</div></div>');
                     } else {
                         fileAdded(sjsElem, file);
                     }
@@ -209,6 +215,7 @@ var sjsFileUpload = {
                         (error === undefined) ? alert('Файл слишком большой (' + file.size + 'B). Максимальный размер файла: ' + maxSize + 'B.') : error(sjsElem, 'File is too big!');
                         if (completeAll != undefined) { completeAll(sjsElem); }
                     }
+
                     xhr.onreadystatechange = function(){
                         if (xhr.readyState == 4) {
                             if (successFile === undefined) {
@@ -217,6 +224,11 @@ var sjsFileUpload = {
                                 var block = progressBlocks.elements[_i];
                                 block.removeClass('__upload_process');
                                 block.addClass('__upload_complete');
+
+                                var response = JSON.parse(xhr.response);
+                                if (!response['status'] && response['errorText']) {
+                                    alert(response['errorText']);
+                                }
                             } else {
                                 successFile(xhr.response, progressBlocks.elements[_i]);
                             }
