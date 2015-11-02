@@ -6,9 +6,9 @@ var sjsFileUpload = {
 
     /**
      * Function to bind DOM element to upload file on drop
-     * @param options Object of handlers to perform on different actions.
+     * @param options Object of handlers to perform on different actions, typeUpload String type upload
      */
-    fileUpload : function(options) {
+    fileUpload : function(options, typeUpload) {
 
         /**
          * Selector of input element
@@ -124,10 +124,16 @@ var sjsFileUpload = {
         url = (url === undefined) ? (elem.hasAttribute('__action_upload')) ? elem.getAttribute('__action_upload') : '/upload' : url;
 
         if (inputSelector === undefined) {
-            sjsElem.append('<div class="__btn_upload">' +
-            '<input class="__input_file" type="file" multiple>' +
-            '<label class="__progress_text">Загрузить файл</label>' +
-            '</div>');
+            var appendVar = '<div class="__btn_upload">' +
+                '<input class="__input_file" type="file" multiple>';
+            if (typeUpload == 'gallery') {
+                appendVar += '<label class="__progress_text">Загрузить картинку</label>';
+            } else {
+                appendVar += '<label class="__progress_text">Загрузить файл</label>';
+            }
+            appendVar += '</div>';
+
+            sjsElem.append(appendVar);
             input = s('.__input_file', sjsElem);
         } else {
             input = s(inputSelector);
@@ -148,13 +154,18 @@ var sjsFileUpload = {
             for (var i = 0; i < files.length; i++) {
                 (function(file){
                     if (fileAdded === undefined) {
-                        sjsElem.parent().append('<div class="__upload_process">' +
-                        '<div class="__progress_bar"><p></p></div>' +
-                        '<div class="__upload_text">' +
-                        '<label class="__progress_text">Загрузка файла</label>' +
-                        '<label class="__progress_bytes"></label>' +
+                        var appendPar = '<div class="__upload_process">' +
+                            '<div class="__progress_bar"><p></p></div>' +
+                            '<div class="__upload_text">';
+                        if (typeUpload == 'gallery') {
+                            appendPar+='<label class="__progress_text">Загрузка картинки</label>';
+                        } else {
+                            appendPar+='<label class="__progress_text">Загрузка файлу</label>';
+                        }
+                        appendPar+='<label class="__progress_bytes"></label>' +
                         '</div>' +
-                        '</div>');
+                        '</div>';
+                        sjsElem.parent().append(appendPar);
                     } else {
                         fileAdded(sjsElem, file);
                     }
@@ -203,12 +214,26 @@ var sjsFileUpload = {
                         sending(sjsElem, file, xhr);
                     }
 
-                    if (maxSize > file.size) {
+                    var flagExt = false;
+
+                    if (typeUpload == 'gallery') {
+                        if (file.type.indexOf('image') != -1) {
+                            flagExt = true;
+                        }
+                    } else {
+                        flagExt = true;
+                    }
+
+                    if (maxSize > file.size && flagExt) {
                         xhr.send(file);
+                    } else if(!flagExt){
+                        (error === undefined) ? alert('Файл не является картинкой (' + file.name + ')') : error(sjsElem, 'File not image!');
+                        if (completeAll != undefined) { completeAll(sjsElem); }
                     } else {
                         (error === undefined) ? alert('Файл слишком большой (' + file.size + 'B). Максимальный размер файла: ' + maxSize + 'B.') : error(sjsElem, 'File is too big!');
                         if (completeAll != undefined) { completeAll(sjsElem); }
                     }
+
                     xhr.onreadystatechange = function(){
                         if (xhr.readyState == 4) {
                             if (successFile === undefined) {
