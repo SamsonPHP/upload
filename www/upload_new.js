@@ -106,7 +106,7 @@ var sjsFileUpload = {
         /**
          * Variables to store elements, to show file upload progress
          */
-        var progressBlocks, progressBars, progressTexts, progressBytes, loadPercent = 0, typeUpload = null;
+        var progressBlocks, progressBars, progressTexts, progressBytes, loadPercent = 0, textUpload = 'файл';
 
         // Bind all input options
         if (typeof options === 'object') {
@@ -118,8 +118,8 @@ var sjsFileUpload = {
             uploadProgress = options.uploadProgress;
             successFile = options.successFile;
             completeAll = options.completeAll;
-            if (options.typeUpload) {
-                typeUpload = options.typeUpload;
+            if (options.textUpload) {
+                textUpload = options.textUpload;
             }
         }
 
@@ -127,16 +127,10 @@ var sjsFileUpload = {
         url = (url === undefined) ? (elem.hasAttribute('__action_upload')) ? elem.getAttribute('__action_upload') : '/upload' : url;
 
         if (inputSelector === undefined) {
-            var appendVar = '<div class="__btn_upload">' +
-                '<input class="__input_file" type="file" multiple>';
-            if (typeUpload == 'gallery') {
-                appendVar += '<label class="__progress_text">Загрузить картинку</label>';
-            } else {
-                appendVar += '<label class="__progress_text">Загрузить файл</label>';
-            }
-            appendVar += '</div>';
-
-            sjsElem.append(appendVar);
+            sjsElem.append('<div class="__btn_upload">' +
+            '<input class="__input_file" type="file" multiple>' +
+            '<label class="__progress_text">Загрузить ' + textUpload + '</label>' +
+            '</div>');
             input = s('.__input_file', sjsElem);
         } else {
             input = s(inputSelector);
@@ -157,18 +151,12 @@ var sjsFileUpload = {
             for (var i = 0; i < files.length; i++) {
                 (function(file){
                     if (fileAdded === undefined) {
-                        var appendPar = '<div class="__upload_process">' +
-                            '<div class="__progress_bar"><p></p></div>' +
-                            '<div class="__upload_text">';
-                        if (typeUpload == 'gallery') {
-                            appendPar+='<label class="__progress_text">Загрузка картинки</label>';
-                        } else {
-                            appendPar+='<label class="__progress_text">Загрузка файлу</label>';
-                        }
-                        appendPar+='<label class="__progress_bytes"></label>' +
-                        '</div>' +
-                        '</div>';
-                        sjsElem.parent().append(appendPar);
+                        sjsElem.parent().append('<div class="__upload_process">' +
+                        '<div class="__progress_bar"><p></p></div>' +
+                        '<div class="__upload_text">' +
+                        '<label class="__progress_text">Загрузка '+ textUpload +
+                        '</label><label class="__progress_bytes"></label>' +
+                        '</div></div>');
                     } else {
                         fileAdded(sjsElem, file);
                     }
@@ -234,8 +222,8 @@ var sjsFileUpload = {
                                 block.addClass('__upload_complete');
 
                                 var response = JSON.parse(xhr.response);
-                                if (!response['status'] && response['verifyImageError']) {
-                                    alert('Файл не является картинкой (' + file.name + ')');
+                                if (!response['status'] && response['errorRequest']) {
+                                    alert(response['errorText']);
                                 }
                             } else {
                                 successFile(xhr.response, progressBlocks.elements[_i]);
