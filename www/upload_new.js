@@ -8,7 +8,7 @@ var sjsFileUpload = {
      * Function to bind DOM element to upload file on drop
      * @param options Object of handlers to perform on different actions, typeUpload String type upload
      */
-    fileUpload : function(options, typeUpload) {
+    fileUpload : function(options) {
 
         /**
          * Selector of input element
@@ -106,7 +106,7 @@ var sjsFileUpload = {
         /**
          * Variables to store elements, to show file upload progress
          */
-        var progressBlocks, progressBars, progressTexts, progressBytes, loadPercent = 0;
+        var progressBlocks, progressBars, progressTexts, progressBytes, loadPercent = 0, typeUpload = null;
 
         // Bind all input options
         if (typeof options === 'object') {
@@ -118,6 +118,9 @@ var sjsFileUpload = {
             uploadProgress = options.uploadProgress;
             successFile = options.successFile;
             completeAll = options.completeAll;
+            if (options.typeUpload) {
+                typeUpload = options.typeUpload;
+            }
         }
 
         // URL to send file
