@@ -106,7 +106,8 @@ var sjsFileUpload = {
         /**
          * Variables to store elements, to show file upload progress
          */
-        var progressBlocks, progressBars, progressTexts, progressBytes, loadPercent = 0, textUpload = 'файл';
+        var progressBlocks, progressBars, progressTexts, progressBytes, loadPercent = 0, textUpload = 'Загрузить файл',
+            textProcess = 'Загрузка файла';
 
         // Bind all input options
         if (typeof options === 'object') {
@@ -121,6 +122,9 @@ var sjsFileUpload = {
             if (options.textUpload) {
                 textUpload = options.textUpload;
             }
+            if (options.textProcess) {
+                textProcess = options.textProcess;
+            }
         }
 
         // URL to send file
@@ -129,7 +133,7 @@ var sjsFileUpload = {
         if (inputSelector === undefined) {
             sjsElem.append('<div class="__btn_upload">' +
             '<input class="__input_file" type="file" multiple>' +
-            '<label class="__progress_text">Загрузить ' + textUpload + '</label>' +
+            '<label class="__progress_text">' + textUpload + '</label>' +
             '</div>');
             input = s('.__input_file', sjsElem);
         } else {
@@ -154,7 +158,7 @@ var sjsFileUpload = {
                         sjsElem.parent().append('<div class="__upload_process">' +
                         '<div class="__progress_bar"><p></p></div>' +
                         '<div class="__upload_text">' +
-                        '<label class="__progress_text">Загрузка '+ textUpload +
+                        '<label class="__progress_text">'+ textProcess +
                         '</label><label class="__progress_bytes"></label>' +
                         '</div></div>');
                     } else {
@@ -222,7 +226,7 @@ var sjsFileUpload = {
                                 block.addClass('__upload_complete');
 
                                 var response = JSON.parse(xhr.response);
-                                if (!response['status'] && response['errorRequest']) {
+                                if (!response['status'] && response['errorText']) {
                                     alert(response['errorText']);
                                 }
                             } else {
