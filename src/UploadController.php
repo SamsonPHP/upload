@@ -18,7 +18,7 @@ class UploadController extends CompressableExternalModule
     public $uploadDirHandler;
 
     /** @var string Prefix for image path saving in db */
-    public $pathPrefix = __SAMSON_BASE__;
+    public $pathPrefix = 'upload/';
 
     /** @var callable External handler to build file name */
     public $fileNameHandler;
