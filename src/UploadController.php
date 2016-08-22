@@ -32,7 +32,7 @@ class UploadController extends CompressableExternalModule
     protected function initFileSystem()
     {
         /** @var \samsonphp\fs\FileService $fs */
-        $fs = !isset($this->fs) ? m('fs') : $this->fs;
+        $fs = !isset($this->fs) ? $this->system->module('fs') : $this->fs;
 
         // Store pointer to file system module
         $this->fs = $fs;
